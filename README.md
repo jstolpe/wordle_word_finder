@@ -2,7 +2,7 @@
 
 Codebase for the wordle word finder.
 
-Live Site -> httpss://wordlewordfinder.com
+Live Site -> https://wordlewordfinder.com
 
 YouTube tutorial on my channel -> https://www.youtube.com/justinstolpe
 
