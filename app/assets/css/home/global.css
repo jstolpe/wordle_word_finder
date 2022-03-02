@@ -1,0 +1,285 @@
+@charset "utf-8";
+
+body {
+	background: #121213;
+	font-family: 'Roboto';
+	padding: 0;
+	margin: 0;
+}
+
+.header {
+	color: #fff;
+	text-align: center;
+	font-weight: bold;
+	border-bottom: 2px solid #3a3a3c;
+	padding: 10px;
+}
+
+.header h1 {
+	margin:  0px;
+	display: inline-block;
+	font-size: 16px;
+}
+
+.warning-container {
+	display: none;
+	position: fixed;
+	background: #ffffff;
+	padding: 10px;
+	border-radius: 5px;
+	top: 100px;
+	left: 50%;
+	transform: translate( -50%,-50% );	
+}
+
+.board-container {
+	margin-top: 10px;
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
+}
+
+.finder-container {
+	width: 265px;
+	margin: 0 auto;
+}
+
+.keyboard-container {
+	margin-top: 10px;
+	position: fixed;
+	bottom: 0px;
+	left: 50%;
+	transform: translate( -50% );
+	width: 100%;
+	background: #121213;
+}
+
+.question {
+	margin-left: 5px;
+}
+
+.question:hover {
+	cursor: pointer;
+}
+
+.help-container {
+	background: #121213;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	display: none;
+	z-index: 1;
+}
+
+.help-contents {
+	max-width: 265px;
+	margin: 0 auto;
+	color: #ffffff;
+	padding-bottom: 30px;
+	border-bottom: 2px solid #3a3a3c;
+}
+
+.help-close-container {
+	float: right;
+	cursor: pointer;
+}
+
+.help {
+	padding: 5px;
+}
+
+.help-list {
+	margin: 0;
+	padding-left:2 0px;
+	font-size: 14px;
+}
+
+.help-list li {
+	margin-top: 30px;
+	font-weight: bold;
+}
+
+.help-list-sub {
+	font-size: 12px;
+	margin-top: 5px;
+	font-weight: normal;
+}
+
+.help-list-green {
+	background: #538d4e;
+	height: 8px;
+	width: 8px;
+	display: inline-block;
+}
+
+.help-list-yellow {
+	background: #b59f3b;
+	height: 8px;
+	width: 8px;
+	display: inline-block;
+}
+
+.help-list-grey {
+	background: #3a3a3c;
+	height: 8px;
+	width: 8px;
+	display: inline-block;
+}
+
+.board-row {
+	height: 50px;
+}
+
+.board .board-row:not(:last-child) {
+	margin-bottom: 5px;
+}
+
+.board-row-cell {
+	border: 2px solid #3a3a3c;
+	color: #ffffff;
+	height: 45px;
+	width: 45px;
+	float: left;
+	font-weight: bold;
+	user-select: none;
+}
+
+.board-row .board-row-cell:not(:last-child) {
+	margin-right: 5px;
+}
+
+.board-row-tile {
+	display: table-cell;
+	height: 45px;
+	width: 45px;
+	vertical-align: middle;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.finder-results-button {
+	border-radius: 5px;
+	user-select: none;
+	background: #85c0f9;
+	color: #fff;
+	margin-top: 10px;
+	text-align: center;
+	padding: 10px;
+	cursor: pointer;
+}
+
+.finder-results {
+	display: none;
+	border: 2px solid #3a3a3c;
+	color: #fff;
+	margin-top: 10px;
+	text-align: center;
+	padding: 10px;
+	margin-bottom: 176px;
+}
+
+.keyboard {
+	margin: 0 auto;
+	width: 500px;
+	font-size: 14px;
+}
+
+.keyboard-row {
+	user-select: none;
+	display: flex;
+	width: 100%;
+	margin-top: 2px;
+}
+
+.key-spacer {
+	flex: 0.5;
+	background: transparent;
+	cursor: default;
+}
+
+.key-text {
+	border-radius: 5px;
+	display: flex;
+	flex: 1.5;
+	height: 50px;
+	justify-content: center;
+	align-items: center;
+	background: #818384;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.key {
+	border-radius: 5px;
+	display: flex;
+	flex: 1; 
+	height: 50px;
+	justify-content: center;
+	align-items: center;
+	background: #818384;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.keyboard-row .key:not(:last-child),
+.keyboard-row .key-text:not(:last-child) {
+	margin-right: 2px;
+}
+
+.filled {
+	cursor: pointer;
+}
+
+.status-green {
+	background: #538d4e;
+	border: 2px solid #538d4e;
+}
+
+.status-yellow {
+	background: #b59f3b;
+	border: 2px solid #b59f3b;
+}
+
+.status-grey {
+	background: #3a3a3c;
+	border: 2px solid #3a3a3c;
+}
+
+.keyboard-row .status-grey {
+	border: 0px;
+	background: #3a3a3c;
+}
+
+.keyboard-row .status-green {
+	border: 0px;
+	background: #538d4e;
+}
+
+.keyboard-row .status-yellow {
+	border: 0px;
+	background: #b59f3b;
+}
+
+.finder-results-column {
+	width: 33%;
+}
+
+@media only screen and ( min-width: 500px ) { /* desktop: do things when size it 1000px or greater */
+	
+}
+
+@media only screen and ( max-width: 500px ) { /* mobile: do things when size it 1000px or less */
+	.finder-results {
+		margin-bottom: 120px;
+	}
+
+	.keyboard {
+		width: 100%;
+	}
+
+	.key,
+	.key-text {
+		height:  35px;
+	}
+}
