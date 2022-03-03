@@ -1,10 +1,10 @@
 # wordle_word finder
 
-Codebase for the wordle word finder.
+Codebase for the wordle word finder. Along with the code I have included the english dictionary sql download, the global includes file template, and a dump of the final database in this repo. Enjoy :D
 
 Live Site -> https://wordlewordfinder.com
 
-YouTube tutorial on my channel -> https://www.youtube.com/justinstolpe
+YouTube tutorial -> https://www.youtube.com/watch?v=Qz1oXZvHOfY
 
 ==========================================================================
     
