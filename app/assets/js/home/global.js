@@ -4,185 +4,160 @@
  * @author Justin Stolpe
  */
 var wordleWordFinder = ( function() {
-	/**
-	 * Initialize the wordle word finder.
-	 * 
-	 * @params object args
-	 * @return void
-	 */
-	var wordleWordFinder = function( args ) {
-		// give us our self
-		var self = this;
+    var wordleWordFinder = function( args ) {
+        // give us our self
+        var self = this;
 
-		 // set container from args
-		self.containerClassTarget = '.' + args.containerClass;
+        // set the board size
+        self.numberOfRows = 'numberOfRows' in args ? args.numberOfRows : 6;
+        self.numberOfColumns = 'numberOfColumns' in args ? args.numberOfColumns : 5;
 
-		// set ajax url from args
-		self.ajaxUrl = args.ajaxUrl;
+        // set container from args
+        self.containerClassTarget = 'containerClass' in args ? '.' + args.containerClass : '.wordle-word-finder';
 
-		// set the board size
-		self.numberOfRows = 6;
-		self.numberOfColumns = 5;
-		
-		// status css
-		self.statusClasses = [
-			'status-grey',
-			'status-green',
-			'status-yellow'
-		];
+        // set ajax url from args
+        self.ajaxUrl = 'ajaxUrl' in args ? args.ajaxUrl : '';
 
-		// array to hold our letters
-		self.letters = [];
+        // status css
+        self.statusClasses = [
+            'status-grey',
+            'status-green',
+            'status-yellow'
+        ];
 
-		// draw out the containers
-		self.drawSkeleton();
+        // array to hold our letters
+        self.letters = [];
 
-		// draw the game board
-		self.drawGameBoard();
+        // draw out the containers
+        self.drawSkeleton();
 
-		// draw the finder
-		self.drawFinder();
+        // draw the game board
+        self.drawGameBoard();
 
-		// draw the keyboard
-		self.drawKeyBoard();
+        // draw the finder
+        self.drawFinder()
 
-		// setup listeners
-		self.setupEvents();
-	}
+        // draw the keyboard
+        self.drawKeyBoard();
 
-	/**
-	 * Setup event listeners.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.setupEvents = function() {
-		// give us our self
-		var self = this;
+        // setup listeners
+        self.setupEvents();
+    }
 
-		// listener for html body interactions
-		self.setupBodyListener();
+    wordleWordFinder.prototype.setupBodyListener = function() {
+        // give us our self
+        var self = this;
 
-		// listen for the on screen keyboard interactions
-		self.setupOnScreenKeyBoardListener();
+        $( 'body' ).on( 'keyup', function( e ) { // body keyup listener for keys being pressed
+            // get the letter from the letter code
+            var theLetter = String.fromCharCode( e.which );
 
-		// listen for tiles being clicked
-		self.setupTileListener();
+            // backspace key is code 8 set letter to "del" if pressed
+            theLetter = 8 == e.which ? 'del' : theLetter;
 
-		// listener for find button
-		self.setupFindButtonListener();
+            // enter key is code 13 set letter to "enter" if pressed
+            theLetter = 13 == e.which ? 'enter' : theLetter;
 
-		// listener for helper
-		self.setupHelperListener();
-	}
+            // update the tile with the letter
+            self.updateTile( theLetter );
+        } );
+    };
 
-	/**
-	 * Setup click for find button.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.setupFindButtonListener = function() {
-		// give us our self
-		var self = this;
+    wordleWordFinder.prototype.setupOnScreenKeyBoardListener = function() {
+        // give us our self
+        var self = this;
 
-		$( '.finder-results-button' ).on( 'click', function() { // on click for each tile
-			// get words!
-			self.findWords();
-		} );
-	}
+        $( '.key, .key-text' ).on( 'click', function() { // on click for our html on screen keyboard
+            // update the tile with the letter
+            self.updateTile( $( this ).data( 'value' ) );
 
-	/**
-	 * Setup click for find button.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.setupTileListener = function() {
-		// give us our self
-		var self = this;
+            gtag( 'event', 'key_press_' + $( this ).data( 'value' ), { // send click event to google analytics
+                'event_category': 'button_click', // category
+                'event_label': 'key', // label
+            } );
+        } );
+    };
 
-		$( '.board-row-tile' ).on( 'click', function () { // on click for each tile
-			if ( $( this ).hasClass( 'filled' ) ) { // only allow clicks if the tile has a letter
-				// get the status of the letter
-				var letterStatus = $( this ).data( 'status' );
-				
-				// new tile status default to greay
-				var newStatus = 'grey';
+    wordleWordFinder.prototype.setupHelperListener = function() {
+        // give us our self
+        var self = this;
 
-				// remove all status classes
-				$( this ).parent().removeClass( self.statusClasses.join( ' ' ) );
+        $( '.question' ).on( 'click', function() { // on click for helper open
+            $( '.help-container' ).show();
 
-				if ( 'grey' == letterStatus ) { // if current status is grey update to green
-					newStatus = 'green';
-				} else if ( 'green' == letterStatus ) { // else if current status is green update to yellow
-					newStatus = 'yellow';
-				}
+            gtag( 'event', 'help_open', { // send click event to google analytics
+                'event_category': 'button_click', // category
+                'event_label': 'help', // label
+            } );
+        } );    
 
-				// add the new status class to the tile
-				$( this ).parent().addClass( 'status-' + newStatus );
+        $( '.help-container' ).on( 'click', function() { // on click for helper close
+            $( '.help-container' ).hide();
 
-				// update the data attribute with the new status
-				$( this ).data( 'status', newStatus );
+            gtag( 'event', 'help_close', { // send click event to google analytics
+                'event_category': 'button_click', // category
+                'event_label': 'help', // label
+            } );
+        } );
+    };
 
-				// remove status classes from keyboard key
-				$( '.key-' + $( this ).html().toLowerCase() ).removeClass( self.statusClasses.join( ' ' ) );
+    wordleWordFinder.prototype.setupTileListener = function() {
+        // give us our self
+        var self = this;
 
-				// update keyboard key with new status
-				$( '.key-' + $( this ).html().toLowerCase() ).addClass( 'status-' + newStatus ); 
-			}
-		} );
-	}
+        $( '.board-row-tile' ).on( 'click', function() { // on click for each tile
+            if ( $( this ).hasClass( 'filled' ) ) { // only allow clicks if the tile has a letter
+                // get the status of the letter
+                var letterStatus = $( this ).data( 'status' );
 
-	/**
-	 * Setup click for on screen keyboard.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.setupOnScreenKeyBoardListener = function() {
-		// give us our self
-		var self = this;
+                // new tile status default to greay
+                var newStatus = 'grey';
 
-		$( '.key, .key-text' ).on( 'click', function() { // on click for our html on screen keyboard
-			// update the tile with the letter
-			self.updateTile( $( this ).data( 'value' ) );
-		} );
-	}
+                // remove all status classes
+                $( this ).parent().removeClass( self.statusClasses.join( ' ' ) );
 
-	/**
-	 * Update game board tile.
-	 * 
-	 * @param string theLetter
-	 * @return void
-	 */
-	wordleWordFinder.prototype.updateTile = function( theLetter ) {
-		// give us our self
-		var self = this;
+                if ( 'grey' == letterStatus ) { // if current status is grey update to green
+                    newStatus = 'green';
+                } else if ( 'green' == letterStatus ) { // else if current status is green update to yellow
+                    newStatus = 'yellow';
+                }
 
-		// get the current letter array index
-		var letterIndex = self.letters.length > 0 ? self.letters.length - 1 : 0;
+                // add the new status class to the tile
+                $( this ).parent().addClass( 'status' + '-' + newStatus );
 
-		if ( 'enter' == theLetter ) { // enter was pressed 
-			// find words!
-			self.findWords();
-		} else if ( 'del' == theLetter && self.letters.length > 0 ) { // backspace pressed and we also need letters in our array
-			// update tile html by clearing it
-			self.updateTileHtml( '', letterIndex );
+                // update the data attribute with the new status
+                $( this ).data( 'status', newStatus );
 
-			// remove last letter from the letters array
-			self.letters.splice( letterIndex, 1 );
-		} else if ( 1 == theLetter.length && theLetter.match( /[a-z]/i ) && self.letters.length < 30 ) { // the letter is a-z and we are not max length
-			// add letter to letters array
-			self.letters.push( theLetter.toLowerCase() );
+                // remove status classes from keyboard key
+                $( '.key-' + $( this ).html().toLowerCase() ).removeClass( self.statusClasses.join( ' ' ) );
 
-			// update tile html with new letter
-			self.updateTileHtml( theLetter, self.letters.length - 1 );
-		}
-	}
+                // update keyboard key with new status
+                $( '.key-' + $( this ).html().toLowerCase() ).addClass( 'status' + '-' + newStatus );
 
-	/**
-	 * Find words.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.findWords = function() {
+                gtag( 'event', 'board_' + newStatus, { // send click event to google analytics
+                    'event_category': 'board_click', // category
+                    'event_label': 'board', // label
+                } ); 
+            }
+        } );
+    };
+
+    wordleWordFinder.prototype.setupFindButtonListener = function() {
+        // give us our self
+        var self = this;
+
+        $( '.finder-results-button' ).on( 'click', function() { // on click for each tile
+            // get words!
+            self.findWords();
+
+            gtag( 'event', 'find_words', { // send click event to google analytics
+                'event_category': 'button_click', // category
+                'event_label': 'button', // label
+            } );
+        } );
+    };
+
+    wordleWordFinder.prototype.findWords = function() {
         // give us our self
         var self = this;
 
@@ -200,15 +175,25 @@ var wordleWordFinder = ( function() {
             // show warning message
             self.showWarning( 'not enough letters' );
         }
-    }
+    };
 
-    /**
-	 * Update the UI with results.
-	 * 
-	 * @param object data
-	 * @return void
-	 */
-	wordleWordFinder.prototype.updateFinder = function( data ) {
+    wordleWordFinder.prototype.showWarning = function( message ) {
+        // give us our self
+        var self = this;
+
+        // set the warning message
+        $( '.warning-container' ).html( message );
+
+        // show the warning class
+        $( '.warning-container' ).show();
+
+        setTimeout( function() { // wait for 1.5 seconds
+            // hide the warning
+            $( '.warning-container' ).hide();
+        }, 1500 );
+    };
+
+    wordleWordFinder.prototype.updateFinder = function( data ) {
         // give us our self
         var self = this;
 
@@ -246,14 +231,9 @@ var wordleWordFinder = ( function() {
             // show a warning message
             self.showWarning( 'no words found' );
         }
-    }
+    };
 
-    /**
-	 * Get request data.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.getRequestData = function() {
+    wordleWordFinder.prototype.getRequestData = function() {
         // give us our self
         var self = this;
 
@@ -308,14 +288,9 @@ var wordleWordFinder = ( function() {
 
         // return data structure with data
         return requestDataStructure;
-    }
+    };
 
-    /**
-	 * Get request data structure.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.getRequestDataStructure = function() {
+    wordleWordFinder.prototype.getRequestDataStructure = function() {
         // give us our self
         var self = this;
 
@@ -336,39 +311,35 @@ var wordleWordFinder = ( function() {
                 contains: []
             }
         };
-    }
+    };
 
-    /**
-	 * Show warning message.
-	 * 
-	 * @param string message
-	 * @return void
-	 */
-	wordleWordFinder.prototype.showWarning = function( message ) {
+    wordleWordFinder.prototype.updateTile = function( theLetter ) {
         // give us our self
         var self = this;
 
-        // set the warning message
-        $( '.warning-container' ).html( message );
+        // get the current letter array index
+        var letterIndex = self.letters.length > 0 ? self.letters.length - 1 : 0;
 
-        // show the warning class
-        $( '.warning-container' ).show();
+        if ( 'enter' == theLetter ) { // enter was pressed 
+            // find words!
+            self.findWords();
+        } else if ( 'del' == theLetter && self.letters.length > 0 ) { // backspace pressed and we also need letters in our array
+            // update tile html by clearing it
+            self.updateTileHtml( '', letterIndex );
 
-        setTimeout( function() { // wait for 1.5 seconds
-            // hide the warning
-            $( '.warning-container' ).hide();
-        }, 1500 );
-    }
+            // remove last letter from the letters array
+            self.letters.splice( letterIndex, 1 );
+        } else if ( 1 == theLetter.length && theLetter.match( /[a-z]/i ) && self.letters.length < 30 ) { // the letter is a-z and we are not max length
+            // add letter to letters array
+            self.letters.push( theLetter.toLowerCase() );
+            
+            // update tile html with new letter
+            self.updateTileHtml( theLetter, self.letters.length - 1 );
+        }
+    };
 
-    /**
-	 * Update the tiles HTML.
-	 * 
-	 * @param string theLetter
-	 * @param integer letterIndex
-	 * @return void
-	 */
-	wordleWordFinder.prototype.updateTileHtml = function( theLetter, letterIndex ) {
-		// give us our self
+    wordleWordFinder.prototype.updateTileHtml = function( theLetter, letterIndex ) {
+        // give us our self
         var self = this;
 
         // get the tile with our index
@@ -398,38 +369,29 @@ var wordleWordFinder = ( function() {
             // remove status from keyboard
             $( '.key-' + self.letters[letterIndex] ).removeClass( self.statusClasses.join( ' ' ) );
         }
-	}
+    };
 
-	/**
-	 * Listener for keyup on the body.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.setupBodyListener = function() {
-		// give us our self
+    wordleWordFinder.prototype.setupEvents = function() {
+        // give us our self
         var self = this;
 
-        $( 'body' ).on( 'keyup', function( e ) { // body keyup listener for keys being pressed
-            // get the letter from the letter code
-            var theLetter = String.fromCharCode( e.which );
+        // listener for html body interactions
+        self.setupBodyListener();
+    
+        // listen for the on screen keyboard interactions
+        self.setupOnScreenKeyBoardListener();
 
-            // backspace key is code 8 set letter to "del" if pressed
-            theLetter = 8 == e.which ? 'del' : theLetter;
+        // listen for tiles being clicked
+        self.setupTileListener();
 
-            // enter key is code 13 set letter to "enter" if pressed
-            theLetter = 13 == e.which ? 'enter' : theLetter;
+        // listener for find button
+        self.setupFindButtonListener();
 
-            // update the tile with the letter
-            self.updateTile( theLetter );
-        } );
-	}
+        // listener for helper
+        self.setupHelperListener();
+    };
 
-	/**
-	 * Draw the body skeleton html.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.drawSkeleton = function() {
+    wordleWordFinder.prototype.drawSkeleton = function() {
         // give us our self
         var self = this;
 
@@ -500,15 +462,26 @@ var wordleWordFinder = ( function() {
 
         // place the html in our container div
         $( self.containerClassTarget ).html( skeletonHtml );
-    }
+    };
 
-    /**
-	 * Draw the game board html.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.drawGameBoard = function() {
-		// give us our self
+    wordleWordFinder.prototype.drawFinder = function() {
+        // give us our self
+        var self = this;
+
+        // html for the finder
+        var finderHtml = '<div class="finder-results-button">' +
+            'Find Words' +
+        '</div>' + 
+        '<div class="finder-results">' +
+
+        '</div>';
+
+        // place the html in our finder container div
+        $( '.finder-container' ).html( finderHtml );
+    };
+
+    wordleWordFinder.prototype.drawGameBoard = function() {
+        // give us our self
         var self = this;
 
         // open div for our board
@@ -536,36 +509,10 @@ var wordleWordFinder = ( function() {
 
         // place the html in our board container div
         $( '.board-container' ).html( boardHtml );
-	}
+    };
 
-	/**
-	 * Draw the finder html.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.drawFinder = function() {
-		// give us our self
-        var self = this;
-
-        // html for the finder
-        var finderHtml = '<div class="finder-results-button">' +
-            'Find Words' +
-        '</div>' + 
-        '<div class="finder-results">' +
-
-        '</div>';
-
-        // place the html in our finder container div
-        $( '.finder-container' ).html( finderHtml );
-	}
-
-	/**
-	 * Draw the keyboard html.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.drawKeyBoard = function() {
-		// give us our self
+    wordleWordFinder.prototype.drawKeyBoard = function() {
+        // give us our self
         var self = this;
 
         // get keyboard rows
@@ -600,48 +547,18 @@ var wordleWordFinder = ( function() {
 
         // place the html in our keyboard container div
         $( '.keyboard-container'  ).html( keyboardHtml );
-	}
+    };
 
-	/**
-	 * On click for helper.
-	 * 
-	 * @return void
-	 */
-	wordleWordFinder.prototype.setupHelperListener = function() {
-		// give us our self
-        var self = this;
-
-        $( '.question' ).on( 'click', function() { // on click for helper open
-            $( '.help-container' ).show();
-        } );    
-
-        $( '.help-container' ).on( 'click', function() { // on click for helper close
-            $( '.help-container' ).hide();
-        } );
-	}
-
-	/**
-	 * Keyboard keys array.
-	 * 
-	 * @return array
-	 */
-	var getKeyboardKeys = function() {
-		return [ // return array of keyboard rows and keys
+    var getKeyboardKeys = function() {
+       return [ // return array of keyboard rows and keys
             [ 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p' ],
             [ '', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '' ],
             [ 'enter', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'del' ]
         ];
-	}
+    };
 
-	/**
-	 * Split array into chunks.
-	 * 
-	 * @param array
-	 * @param integer length
-	 * @return array
-	 */
-	var splitArrayIntoChunks = function( array, length ) {
-		// array of chunks with the specified length
+    var splitArrayIntoChunks = function( array, length ) {
+        // array of chunks with the specified length
         var chunks = [];
 
         // iterator
@@ -654,8 +571,8 @@ var wordleWordFinder = ( function() {
 
         // return all chunks
         return chunks;
-	}
+    };
 
-	// return our object
-	return wordleWordFinder;
+    // return our object
+    return wordleWordFinder;
 } )();

@@ -33,21 +33,12 @@
 		}
 
 		/**
-		 * Noramlize words in db.
-		 *
-		 * @return void
-		 */
-		public function normalize() {
-			$this->DictionaryModel->normalize();
-		}
-
-		/**
 		 * Get words.
 		 *
 		 * @return void
 		 */
 		public function getWords() {
-			$this->DictionaryModel->getWords();
+			$this->DictionaryModel->getWords( $_POST );
 		}
 	}
 ?>

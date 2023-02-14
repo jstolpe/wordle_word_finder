@@ -4,7 +4,7 @@
 <!-- page specific js -->
 <script src="<?php echo BASE_URL_ASSETS; ?>js/home/global.js"></script>
 
-<script>
+<script type="text/javascript">
 	$( function() { // doc ready
 		var wwf = new wordleWordFinder( { // create wordle word finder!
 			containerClass: 'wordle-word-finder',

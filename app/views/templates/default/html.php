@@ -3,7 +3,7 @@
 	<head>
 		<!-- html title -->
 		<title>
-			<?php echo $html_title; ?>
+			<?php echo $html_title ;?>
 		</title>
 
 		<!-- charset -->
@@ -30,6 +30,11 @@
 		<meta property="twitter:image" content="https://wordlewordfinder.com/php_site/app/assets/images/logo.png" />
 		<meta property="twitter:image:alt" content="Wordle Word Finder" />
 
+		<!-- seo -->
+		<link rel="canonical" href="https://wordlewordfinder.com/">
+		<link rel="shortcut icon" href="<?php echo BASE_URL_ASSETS; ?>images/favicon.ico" />
+		<link rel="apple-touch-icon-precomposed" href="<?php echo BASE_URL_ASSETS; ?>images/logo.png" />
+
 		<!-- css fonts -->
 		<link rel="preconnect" href="https://fonts.gstatic.com">
 		<link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet">
@@ -43,8 +48,8 @@
 		<!-- template js -->
 		<script src="<?php echo BASE_URL_ASSETS; ?>js/templates/default/global.js"></script>
 
-		<script>
-			$( function() { // doc ready
+		<script type="text/javascript">
+			$( function() {
 				wordleWordFinderGlobals.initialize( { // initalize global javascript
 					baseUrl: '<?php echo HREF_BASE_URL; ?>'
 				} );

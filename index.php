@@ -1,6 +1,6 @@
 <?php
-	// include server global defines and creds
-	include 'wordle_word_finder_global_include.php';
+	// include includes!
+	include __DIR__ . '/../../includes/wordle_word_finder_global_include.php';
 
 	if ( ENVIRONMENT == 'development' ) { // development env specific things
 		// display all errors
@@ -18,7 +18,7 @@
 	$autoloaderParmas = array( // autoloader parmas
 		'database' => array( // database info
 			'load' => USE_DATABASE, // should we load the database
-			'creds' => $databaseCreds
+			'creds' => $databaseCreds // database creds
 		)
 	);
 
