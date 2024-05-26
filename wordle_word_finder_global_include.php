@@ -36,4 +36,4 @@
 	);
 
 	// used for ga tracking
-	define( 'GOOGLE_ANALYTICS_ID', '' );
+	define( 'GOOGLE_ANALYTICS_ID', 'G-5QPMM5DEDZ' );

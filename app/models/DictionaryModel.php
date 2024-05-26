@@ -15,11 +15,11 @@
 		 *
 		 * @var	string
 		 */
-		const TABLE_NAME = 'dictionary';
+		const TABLE_NAME = 'wordle_word_finder_dictionary';
 
 		public function normalizeWords() {
 			// specify database table
-			$this->database->table( 'entries' );
+			$this->database->table( 'wordle_word_finder_entries' );
 
 			// set fetch mode
 			$this->database->fetch( Database::PDO_FETCH_MULTI );
@@ -64,7 +64,7 @@
 				SELECT
 					word
 				FROM 
-					dictionary 
+					wordle_word_finder_dictionary 
 				';
 
 			$where = array();

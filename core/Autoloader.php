@@ -10,6 +10,7 @@
 	 * @link		https://github.com/jstolpe/iarecoding
 	 * @version     1.0.0
 	 */
+	#[\AllowDynamicProperties]
 	class Autoloader {
 		/**
 		 * Autoload files in these folders.
@@ -47,6 +48,13 @@
 		private $_database = array();
 
 		/**
+		 * Session info.
+		 *
+		 * @var	array
+		 */
+		public $session = array();
+
+		/**
 		 * Class constructor.
 		 *
 		 * Autoload files for use.
@@ -72,6 +80,14 @@
 
 			if ( isset( $params['database']['load'] ) && $params['database']['load'] ) { // load database
 				$this->_database = new Database( $params['database']['creds'] );
+			
+				if ( isset( $params['session'] ) && $params['session']['load'] ) { // use session helper
+					// add database to the session params
+					$params['session']['database'] = $this->_database;
+
+					// load the session
+					$this->_session = new Session( $params['session'] );
+				}
 			}
 		}
 

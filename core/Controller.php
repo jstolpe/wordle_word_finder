@@ -10,7 +10,15 @@
 	 * @link		https://github.com/jstolpe/iarecoding
 	 * @version     1.0.0
 	 */
+	#[\AllowDynamicProperties]
 	class Controller {
+		/**
+		 * Session object.
+		 *
+		 * @var	object
+		 */
+ 		public $session;
+
 		/**
 		 * Class constructor.
 		 *
@@ -42,6 +50,9 @@
 
 				$this->$modelName->allModelsLoaded = true;
 			}
+
+			// save session in our global model class
+			$this->session =& $autoloader->_session;	
 		}
 
 		/**
